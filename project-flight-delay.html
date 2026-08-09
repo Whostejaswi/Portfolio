@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flight Delay &amp; Cancellation Analysis — Tejaswi Krishnaraj</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="projects">
+
+<div class="site-loader" data-site-loader aria-hidden="true">
+  <div class="loader-quote"><div class="lq-text" data-loader-quote></div><div class="lq-rule"></div></div>
+</div>
+
+<header class="site-header">
+  <a href="index.html" class="logo">tejaswi</a>
+  <button class="menu-btn" data-menu-open><span class="bars"><span></span><span></span><span></span></span>menu</button>
+</header>
+
+<nav class="nav-overlay">
+  <button class="nav-overlay-close" data-menu-close>close</button>
+  <ul class="nav-links">
+    <li><a href="index.html"><span class="num">00</span> home</a></li>
+    <li><a href="about.html"><span class="num">01</span> about</a></li>
+    <li><a href="projects.html" class="active"><span class="num">02</span> projects</a></li>
+    <li><a href="skills.html"><span class="num">03</span> skills</a></li>
+    <li><a href="experience.html"><span class="num">04</span> experience</a></li>
+    <li><a href="protosem.html"><span class="num">05</span> protosem</a></li>
+  </ul>
+  <div class="nav-footer">
+    <a href="mailto:tejaswi.shj2006@gmail.com">tejaswi.shj2006@gmail.com</a>
+    <a href="https://github.com/Whostejaswi" target="_blank" rel="noopener">github</a>
+    <a href="https://www.linkedin.com/in/tejaswi-k-2986b5255" target="_blank" rel="noopener">linkedin</a>
+  </div>
+</nav>
+
+<main>
+  <section class="page-hero wrap">
+    <a class="pd-back" href="projects.html">← back to projects</a>
+    <div class="pd-head-row">
+      <h1>Flight Delay &amp; Cancellation Analysis</h1>
+      <span class="status-pill "><span class="pip"></span>completed</span>
+    </div>
+    <p class="lede">A full analytics pipeline over 200,000+ U.S. domestic flight records, surfacing the real drivers behind delays.</p>
+    <div class="pd-stack-line">Personal data analytics project</div>
+  </section>
+
+  <section class="wrap">
+    <div class="pd-grid">
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg></div>
+        <h4>Problem statement</h4>
+        <p>Flight delays raise operational costs, waste airport resources, and hurt passenger experience — and because delays propagate across connected flights, understanding what drives them matters a lot for scheduling and operations.</p>
+      </div>
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg></div>
+        <h4>Solution</h4>
+        <p>An analytics pipeline built on 200,000+ flight records, turning raw operational data into actionable insight through statistical analysis, feature engineering, and interactive visualisation — surfacing delay causes, carrier performance, and high-risk travel windows.</p>
+      </div>
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></div>
+        <h4>Approach</h4>
+        <p>Data cleaning (missing values, outliers), EDA to surface relationships between delays/airlines/airports/timing, feature engineering (Robust Scaling, One-Hot Encoding, log transforms), PCA down to 2 components retaining ~70% variance, and a Power BI dashboard for the final KPIs and trends.</p>
+      </div>
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5Z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h4>Status</h4>
+        <p>Completed — full pipeline and dashboard delivered.</p>
+      </div>
+      <div class="pd-box pd-tech">
+        <h4>Tech stack</h4>
+        <div class="tech-tags"><span>Python</span><span>RobustScaler</span><span>One-Hot Encoding</span><span>Log Transformation</span><span>PCA</span><span>Power BI</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-credit">designed &amp; built by Tejaswi Krishnaraj</div>
+    <div class="footer-links">
+      <a href="mailto:tejaswi.shj2006@gmail.com">email</a>
+      <a href="https://github.com/Whostejaswi" target="_blank" rel="noopener">github</a>
+      <a href="https://www.linkedin.com/in/tejaswi-k-2986b5255" target="_blank" rel="noopener">linkedin</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

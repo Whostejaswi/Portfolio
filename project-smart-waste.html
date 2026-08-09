@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Waste Management System — Tejaswi Krishnaraj</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="projects">
+
+<div class="site-loader" data-site-loader aria-hidden="true">
+  <div class="loader-quote"><div class="lq-text" data-loader-quote></div><div class="lq-rule"></div></div>
+</div>
+
+<header class="site-header">
+  <a href="index.html" class="logo">tejaswi</a>
+  <button class="menu-btn" data-menu-open><span class="bars"><span></span><span></span><span></span></span>menu</button>
+</header>
+
+<nav class="nav-overlay">
+  <button class="nav-overlay-close" data-menu-close>close</button>
+  <ul class="nav-links">
+    <li><a href="index.html"><span class="num">00</span> home</a></li>
+    <li><a href="about.html"><span class="num">01</span> about</a></li>
+    <li><a href="projects.html" class="active"><span class="num">02</span> projects</a></li>
+    <li><a href="skills.html"><span class="num">03</span> skills</a></li>
+    <li><a href="experience.html"><span class="num">04</span> experience</a></li>
+    <li><a href="protosem.html"><span class="num">05</span> protosem</a></li>
+  </ul>
+  <div class="nav-footer">
+    <a href="mailto:tejaswi.shj2006@gmail.com">tejaswi.shj2006@gmail.com</a>
+    <a href="https://github.com/Whostejaswi" target="_blank" rel="noopener">github</a>
+    <a href="https://www.linkedin.com/in/tejaswi-k-2986b5255" target="_blank" rel="noopener">linkedin</a>
+  </div>
+</nav>
+
+<main>
+  <section class="page-hero wrap">
+    <a class="pd-back" href="projects.html">← back to projects</a>
+    <div class="pd-head-row">
+      <h1>Smart Waste Management System</h1>
+      <span class="status-pill "><span class="pip"></span>completed</span>
+    </div>
+    <p class="lede">CleanBin — an AI and IoT-enabled system that monitors bin fill levels, verifies segregation, and rewards responsible disposal.</p>
+    <div class="pd-stack-line">Personal ML + IoT project</div>
+  </section>
+
+  <section class="wrap">
+    <div class="pd-grid">
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg></div>
+        <h4>Problem statement</h4>
+        <p>Urban waste management suffers from inefficient collection, poor segregation at the source, and no real-time monitoring — overflowing bins raise costs, pollution, and health risks, while municipalities lack the data to optimise collection.</p>
+      </div>
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg></div>
+        <h4>Solution</h4>
+        <p>CleanBin monitors bin fill levels, verifies proper waste segregation with computer vision, and rewards responsible disposal through a QR-code reward system, giving municipalities a centralised dashboard for real-time monitoring.</p>
+      </div>
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></div>
+        <h4>Approach</h4>
+        <p>IoT fill-level sensors track accumulation while a YOLOv8-based computer vision pipeline verifies correct segregation before rewarding points — trained on ~3,000 annotated images, reaching 90% accuracy and an F1-score of 0.90. Data streams to a cloud dashboard so collection routes can be optimised.</p>
+      </div>
+      <div class="pd-box">
+        <div class="pd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3B4B7A" stroke-width="1.6"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5Z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h4>Status</h4>
+        <p>Completed — trained model, working sensor pipeline, and reward system all integrated and tested.</p>
+      </div>
+      <div class="pd-box pd-tech">
+        <h4>Tech stack</h4>
+        <div class="tech-tags"><span>YOLOv8</span><span>Raspberry Pi 3</span><span>IoT Sensors</span><span>AI Image Recognition</span><span>Cloud Dashboard</span><span>QR Reward System</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-credit">designed &amp; built by Tejaswi Krishnaraj</div>
+    <div class="footer-links">
+      <a href="mailto:tejaswi.shj2006@gmail.com">email</a>
+      <a href="https://github.com/Whostejaswi" target="_blank" rel="noopener">github</a>
+      <a href="https://www.linkedin.com/in/tejaswi-k-2986b5255" target="_blank" rel="noopener">linkedin</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
