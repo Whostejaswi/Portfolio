@@ -1,0 +1,7 @@
+POST https://io.adafruit.com/api/v2/YOUR_AIO_USERNAME/feeds/bulb-switch/data
+Content-Type: application/json
+X-AIO-Key: YOUR_AIO_KEY
+
+{
+  "value": "ON"
+}

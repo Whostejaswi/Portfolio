@@ -277,6 +277,14 @@ function renderEntryBody(entry) {
     html += `</div>`;
   }
 
+  if (entry.repo) {
+    html += `
+      <div class="log-section">
+        <h6>source code</h6>
+        <p><a href="${escapeHtml(entry.repo)}" target="_blank" rel="noopener">${escapeHtml(entry.repo)}</a></p>
+      </div>`;
+  }
+
   if (entry.challenges && entry.challenges.length) {
     html += `
       <div class="log-section">

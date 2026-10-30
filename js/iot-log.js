@@ -54,6 +54,7 @@ const iotLog = [
   {
     date: "2026-09-01",
     title: "Task 1 — Controlling an LED over HTTP",
+    repo: "https://github.com/Whostejaswi/Portfolio/tree/main/code/task1-http-led",
     text: `For this one I turned my ESP32 into its own tiny web server, just so I could switch its built-in LED on and off from a browser — no app, no cloud, nothing extra involved.
 
 I connected it to my Wi-Fi using WiFi.h, then used WebServer.h to set up two routes — /on and /off — that just flip the LED pin whenever the browser hits them. The LED is the built-in one on GPIO2, so I didn't even need extra components for this one, just the board itself.
@@ -159,6 +160,7 @@ void loop() {
   {
     date: "2026-09-04",
     title: "Task 2 — MQTT dashboard controlling a real bulb",
+    repo: "https://github.com/Whostejaswi/Portfolio/tree/main/code/task2-mqtt-relay",
     text: `Here I moved off the local network completely. I set up an Adafruit IO dashboard with a switch, and that switch now controls an actual 230V bulb through a relay — from anywhere with internet, not just my home Wi-Fi.
 
 Components were the ESP32, a 5V relay module (SRD-05VDC-SL-C), and the bulb itself. GPIO26 goes to the relay's IN pin, and on this relay, GPIO26 HIGH means the coil turns on. Only the bulb's Live wire runs through the relay's COM → NO contacts — Neutral goes straight to the bulb and is never switched, which matters a lot when you're dealing with mains voltage.
@@ -248,6 +250,7 @@ void loop() {
   {
     date: "2026-09-07",
     title: "Task 3 — Turning the bulb on with my voice",
+    repo: "https://github.com/Whostejaswi/Portfolio/tree/main/code/task3-voice-ifttt",
     text: `Same exact hardware as Task 2, no rewiring at all — I just added a voice layer on top of it. Now saying "Hey Google, turn on the bulb" controls the same relay.
 
 I set up an IFTTT applet with Google Assistant as the trigger and a Webhooks action that posts straight to the same Adafruit IO feed the ESP32 was already listening to. The part I found genuinely interesting: I didn't have to touch the firmware at all. The ESP32 has no idea whether a value on its feed came from someone tapping the dashboard or from a voice command — it just reacts either way. Once the plumbing from Task 2 was right, this was almost entirely a no-code layer on top.`,
@@ -269,27 +272,28 @@ X-AIO-Key: YOUR_AIO_KEY
 
 {
   "value": "ON"
-}
-  
-
-#include <WiFi.h>
+}`,
+      },
+      {
+        label: "esp32_mqtt_relay.ino — same firmware and hardware as Task 2",
+        code: `#include <WiFi.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
- 
+
 const char* ssid     = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
- 
+
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883
 #define AIO_USERNAME    "YOUR_AIO_USERNAME"
 #define AIO_KEY         "YOUR_AIO_KEY"
- 
+
 const int RELAY_PIN = 26;
- 
+
 WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
 Adafruit_MQTT_Subscribe bulbFeed = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/bulb-switch");
- 
+
 void connectMQTT() {
   int8_t ret;
   while ((ret = mqtt.connect()) != 0) {
@@ -298,21 +302,21 @@ void connectMQTT() {
     delay(5000);
   }
 }
- 
+
 void setup() {
   Serial.begin(115200);
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
- 
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) delay(500);
- 
+
   mqtt.subscribe(&bulbFeed);
 }
- 
+
 void loop() {
   connectMQTT();
- 
+
   Adafruit_MQTT_Subscribe *subscription;
   while ((subscription = mqtt.readSubscription(5000))) {
     if (subscription == &bulbFeed) {
@@ -339,6 +343,7 @@ void loop() {
   {
     date: "2026-09-11",
     title: "Task 4 — Building my own Firebase dashboard",
+    repo: "https://github.com/Whostejaswi/Portfolio/tree/main/code/task4-firebase-dashboard",
     text: `This is where I moved off Adafruit IO entirely and built my own dashboard from scratch, backed by Firebase — complete with a login page and live sensor readings instead of just a switch.
 
 Components this time: ESP32, a DHT11 for temperature and humidity, an LDR for light, and the same relay + bulb setup. DHT11 data goes to GPIO4, the LDR's analog output goes to GPIO34, and the relay stays on GPIO26.
@@ -412,7 +417,6 @@ void loop() {
     ],
     // TODO: real bug if any — auth errors, rule misconfiguration, etc.
     challenges: [`Though this task seemed simple, i had a lot of trouble setting my dashboard. While setting up the Firebase dashboard, I faced several integration challenges. The main issues were configuring Firebase Authentication and Realtime Database permissions, resolving “unauthorized” errors from the ESP32, and aligning the Firebase database paths between the ESP32 and dashboard. I also encountered mismatches in device IDs, data structures, and mode values (AUTO vs. AUTOMATIC). The dashboard initially failed to display live and historical sensor readings because it was reading different database paths.`],
-    repo: "https://protosem-4fb5a.web.app/",
     reflection: `Understanding BaaS and auth vs. authorization mattered more here than the wiring did — this was the first task where the cloud side was genuinely harder than the electronics.`,
     images: [
       "assets/iot/dashboard.png",
@@ -420,10 +424,15 @@ void loop() {
       "assets/iot/database.png",
       "assets/iot/auth.png",
     ],
+    videos:
+    [
+      "assets/iot/webpage worfklow.mp4"
+    ]
   },
   {
     date: "2026-09-15",
     title: "Task 5 — Logging, automation, and a whole lot of debugging",
+    repo: "https://github.com/Whostejaswi/Portfolio/tree/main/code/task5-logging-automation",
     text: `This last one pulled everything together — manual and automatic bulb control, a full history of readings, and CSV export. Honestly, most of the actual work here wasn't building new features, it was debugging, because my dashboard and firmware had been built a bit separately and didn't actually agree with each other.
 
 The final structure ended up being one device path with three parts: a "current" branch for live values (temperature, humidity, LDR reading, bulb state, mode), a "settings" branch for mode/threshold/commands, and a "logs" branch for timestamped history, one entry per reading.
@@ -901,7 +910,6 @@ void loop()
       "Once the LDR was actually working, auto mode felt laggy, because the relay check was stuck inside the same slow loop that pushed data to Firebase every few seconds. Gave it its own faster loop.",
       "Then I noticed the bulb's own light was messing with the LDR reading since it sits close by, causing it to swing to the extremes and flicker. That's what the hysteresis buffer above was actually for.",
     ],
-    repo: "https://protosem-4fb5a.web.app/",
     reflection: `Most of the real learning was in the bugs, not the features — a single word mismatch (AUTO vs AUTOMATIC) taught me more about careful naming than any tutorial could. Limitations for now: the threshold is set manually rather than auto-calibrated to the room, and the LDR still picks up some of the bulb's own light since it's positioned nearby. Next thing I'd improve is moving the LDR further from the bulb and auto-calibrating the threshold instead of setting it by hand.`,
     images: [
       "assets/iot/sensor-wiring.png",
