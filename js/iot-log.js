@@ -244,7 +244,7 @@ void loop() {
       "assets/iot/relay-wiring.png"
     ],
     videos: [
-      "assets/iot/relay-switch.mp4"
+      "assets/iot/relay switch.mp4"
     ]
   },
   {
