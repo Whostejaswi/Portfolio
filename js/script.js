@@ -244,6 +244,17 @@ function renderEntryBody(entry) {
       </div>`;
   }
 
+  if (entry.sections && entry.sections.length) {
+    entry.sections.forEach((sec) => {
+      html += `
+      <div class="log-section">
+        <h6>${escapeHtml(sec.heading)}</h6>
+        ${sec.body ? `<p>${escapeHtml(sec.body)}</p>` : ""}
+        ${sec.items && sec.items.length ? `<ul>${sec.items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>` : ""}
+      </div>`;
+    });
+  }
+
   if (entry.hardware && entry.hardware.length) {
     html += `
       <div class="log-section">

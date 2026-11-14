@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Nicko's House</title>
+<style>
+  :root{
+    --bg:#fdf6ec;--bg2:#f7ead6;--ink:#2e2118;--muted:#8a7863;
+    --accent:#d97b3f;--accent2:#c65a2c;--card:#ffffff;--border:#ecdcc4;
+    --ok:#4a8c5f;--warn:#c0392b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+    color:var(--ink);min-height:100vh;
+  }
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:20px 5%;background:#fffdf9;border-bottom:1px solid var(--border);
+  }
+  .logo{font-weight:800;font-size:1.15rem;}
+  .logo span{color:var(--accent2);}
+  .userbar{display:flex;align-items:center;gap:14px;}
+  #userEmail{font-size:0.85rem;color:var(--muted);}
+  .signout{
+    background:transparent;border:1px solid var(--border);padding:8px 16px;
+    border-radius:20px;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--ink);
+  }
+  main{max-width:1100px;margin:0 auto;padding:32px 5% 60px;}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin-bottom:30px;}
+  .tile{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:22px;text-align:center;
+  }
+  .tile .label{font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .tile .value{font-size:2rem;font-weight:800;margin-top:8px;color:var(--accent2);}
+  .tile .unit{font-size:0.9rem;color:var(--muted);}
+
+  .panel{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:24px;margin-bottom:24px;
+  }
+  .panel h3{margin-bottom:16px;font-size:1.05rem;}
+
+  .controls{display:flex;flex-wrap:wrap;gap:24px;align-items:center;}
+  .mode-toggle{display:flex;background:var(--bg2);border-radius:30px;padding:4px;}
+  .mode-toggle button{
+    border:none;background:transparent;padding:8px 20px;border-radius:26px;
+    font-weight:700;cursor:pointer;font-size:0.9rem;color:var(--muted);
+  }
+  .mode-toggle button.active{background:var(--accent2);color:#fff;}
+  .bulb-btn{
+    padding:10px 26px;border-radius:24px;border:none;font-weight:700;cursor:pointer;
+    background:#ddd;color:#666;
+  }
+  .bulb-btn.on{background:var(--ok);color:#fff;}
+  .bulb-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .threshold-group label{font-size:0.85rem;color:var(--muted);margin-right:8px;}
+  .threshold-group input{
+    width:90px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;font-size:0.78rem;text-transform:uppercase;}
+  .empty-state{text-align:center;color:var(--muted);padding:30px;font-size:0.9rem;}
+
+  canvas{width:100% !important;max-height:320px;}
+
+  .export-btn{
+    background:var(--accent2);color:#fff;border:none;padding:10px 22px;
+    border-radius:24px;font-weight:700;cursor:pointer;font-size:0.9rem;
+  }
+  .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">🏡 nicko<span>'s house</span></div>
+    <div class="userbar">
+      <span id="userEmail">—</span>
+      <button class="signout" id="signOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="tiles">
+      <div class="tile"><div class="label">Temperature</div><div class="value" id="tTemp">—</div><div class="unit">°C</div></div>
+      <div class="tile"><div class="label">Humidity</div><div class="value" id="tHum">—</div><div class="unit">%</div></div>
+      <div class="tile"><div class="label">Light (LDR)</div><div class="value" id="tLdr">—</div><div class="unit">raw</div></div>
+      <div class="tile"><div class="label">Bulb</div><div class="value" id="tBulb">—</div><div class="unit">state</div></div>
+      <div class="tile"><div class="label">Mode</div><div class="value" id="tMode">—</div><div class="unit">current</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>Controls</h3>
+      <div class="controls">
+        <div class="mode-toggle">
+          <button id="manualBtn">Manual</button>
+          <button id="autoBtn">Auto</button>
+        </div>
+        <button class="bulb-btn" id="bulbBtn">Bulb OFF</button>
+        <div class="threshold-group">
+          <label>LDR threshold</label>
+          <input type="number" id="thresholdInput" placeholder="e.g. 500">
+          <button class="signout" id="saveThresholdBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Sensor trends</h3>
+      </div>
+      <canvas id="trendChart"></canvas>
+      <div class="empty-state" id="chartEmpty">No readings logged yet — data will appear here once your ESP32 starts sending.</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>History</h3>
+        <button class="export-btn" id="exportBtn">Download CSV</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Timestamp</th><th>Temp (°C)</th><th>Humidity (%)</th><th>LDR</th><th>Bulb</th><th>Mode</th></tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+      <div class="empty-state" id="tableEmpty">No history yet.</div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+    // Paste your own Firebase web-app config here (same one login.html uses)
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.YOUR_REGION.firebasedatabase.app",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "1:YOUR_SENDER_ID:web:45175f3c288c4e878d51c6",
+  measurementId: "YOUR_MEASUREMENT_ID"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let uid = null;
+    let currentMode = null;
+    let chart = null;
+
+    onAuthStateChanged(auth, (user)=>{
+      if(!user){ window.location.href = "login.html"; return; }
+      uid = user.uid;
+      document.getElementById("userEmail").textContent = user.email || "Google user";
+      attachListeners();
+    });
+
+    document.getElementById("signOutBtn").addEventListener("click", ()=>{
+      signOut(auth).then(()=> window.location.href = "index.html");
+    });
+
+    function attachListeners(){
+      // Live current values
+      onValue(ref(db, `devices/${uid}/current`), (snap)=>{
+        const d = snap.val();
+        if(!d) return;
+        document.getElementById("tTemp").textContent = d.temperature ?? "—";
+        document.getElementById("tHum").textContent = d.humidity ?? "—";
+        document.getElementById("tLdr").textContent = d.ldr ?? "—";
+        document.getElementById("tBulb").textContent = d.bulbState ?? "—";
+        document.getElementById("tMode").textContent = d.mode ?? "—";
+
+        const bulbBtn = document.getElementById("bulbBtn");
+        bulbBtn.textContent = `Bulb ${d.bulbState || "OFF"}`;
+        bulbBtn.classList.toggle("on", d.bulbState === "ON");
+      });
+
+      // Settings (mode, threshold)
+      onValue(ref(db, `devices/${uid}/settings`), (snap)=>{
+        const s = snap.val();
+        if(!s) return;
+        currentMode = s.mode || "AUTO";
+        document.getElementById("manualBtn").classList.toggle("active", currentMode === "MANUAL");
+        document.getElementById("autoBtn").classList.toggle("active", currentMode === "AUTO");
+        document.getElementById("bulbBtn").disabled = currentMode !== "MANUAL";
+        if(s.ldrThreshold !== undefined){
+          document.getElementById("thresholdInput").value = s.ldrThreshold;
+        }
+      });
+
+      // Historical logs -> table + chart, no placeholder data
+      onValue(ref(db, `devices/${uid}/logs`), (snap)=>{
+        const logs = snap.val();
+        const tbody = document.getElementById("historyBody");
+        const tableEmpty = document.getElementById("tableEmpty");
+        const chartEmpty = document.getElementById("chartEmpty");
+        tbody.innerHTML = "";
+
+        if(!logs){
+          tableEmpty.style.display = "block";
+          chartEmpty.style.display = "block";
+          if(chart){ chart.destroy(); chart = null; }
+          return;
+        }
+
+        const rows = Object.values(logs).sort((a,b)=> a.timestamp - b.timestamp);
+        tableEmpty.style.display = "none";
+        chartEmpty.style.display = "none";
+
+        rows.slice().reverse().forEach(r=>{
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${new Date(r.timestamp).toLocaleString()}</td>
+            <td>${r.temperature}</td>
+            <td>${r.humidity}</td>
+            <td>${r.ldr}</td>
+            <td>${r.bulbState}</td>
+            <td>${r.mode}</td>`;
+          tbody.appendChild(tr);
+        });
+
+        drawChart(rows);
+      });
+    }
+
+    function drawChart(rows){
+      const labels = rows.map(r => new Date(r.timestamp).toLocaleTimeString());
+      const temps = rows.map(r => r.temperature);
+      const hums = rows.map(r => r.humidity);
+      const ldrs = rows.map(r => r.ldr);
+
+      const ctx = document.getElementById("trendChart").getContext("2d");
+      if(chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            { label: "Temperature (°C)", data: temps, borderColor: "#d97b3f", tension: 0.3 },
+            { label: "Humidity (%)", data: hums, borderColor: "#4a8c5f", tension: 0.3 },
+            { label: "LDR", data: ldrs, borderColor: "#8a7863", tension: 0.3 }
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+      });
+    }
+
+    // Manual / Auto mode toggle
+    document.getElementById("manualBtn").addEventListener("click", ()=>{
+      update(ref(db, `devices/${uid}/settings`), { mode: "MANUAL" });
+    });
+    document.getElementById("autoBtn").addEventListener("click", ()=>{
+      update(ref(db, `devices/${uid}/settings`), { mode: "AUTO" });
+    });
+
+    // Manual bulb control
+    document.getElementById("bulbBtn").addEventListener("click", ()=>{
+      const btn = document.getElementById("bulbBtn");
+      const next = btn.classList.contains("on") ? "OFF" : "ON";
+      update(ref(db, `devices/${uid}/settings`), { bulbCommand: next });
+    });
+
+    // Threshold save
+    document.getElementById("saveThresholdBtn").addEventListener("click", ()=>{
+      const val = Number(document.getElementById("thresholdInput").value);
+      if(!isNaN(val)){
+        update(ref(db, `devices/${uid}/settings`), { ldrThreshold: val });
+      }
+    });
+
+    // CSV export
+    document.getElementById("exportBtn").addEventListener("click", ()=>{
+      onValue(ref(db, `devices/${uid}/logs`), (snap)=>{
+        const logs = snap.val();
+        if(!logs){ alert("No data to export yet."); return; }
+        let csv = "Timestamp,Temperature,Humidity,LDR,BulbState,Mode\n";
+        Object.values(logs).forEach(r=>{
+          csv += `${new Date(r.timestamp).toISOString()},${r.temperature},${r.humidity},${r.ldr},${r.bulbState},${r.mode}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "nickos_house_logs.csv";
+        a.click();
+      }, { onlyOnce: true });
+    });
+  </script>
+</body>
+</html>
