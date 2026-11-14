@@ -167,6 +167,39 @@ Components were the ESP32, a 5V relay module (SRD-05VDC-SL-C), and the bulb itse
 
 MQTT works pretty differently from HTTP. Instead of me asking the ESP32 for something, it just subscribes to a "feed" on Adafruit IO, and the moment the dashboard publishes ON or OFF, it reacts instantly. I also tested the relay logic with a safe low-voltage signal first before I let it anywhere near the actual mains wiring — wasn't about to skip that step.`,
     concepts: `MQTT flips the usual request-response model on its head: instead of asking for something, the ESP32 subscribes to a "feed" (a topic) on a broker — here, Adafruit IO — and reacts the instant a new value is published to it. No polling, no asking, it just listens.`,
+    sections: [
+      {
+        heading: "Adafruit IO account",
+        items: [
+          "Signed up for a free account at io.adafruit.com",
+          "Used the key icon in the Adafruit IO toolbar to get my AIO username and AIO key, the two values the ESP32 uses to log in to the broker",
+          "Both go into the sketch (AIO_USERNAME and AIO_KEY), and the username also appears in the feed path",
+        ],
+      },
+      {
+        heading: "feed and dashboard configuration",
+        items: [
+          "Feed: bulb-switch, which acts as the MQTT topic, with the full path <username>/feeds/bulb-switch",
+          "Dashboard block: a Toggle block titled Relay Control, with ON and OFF button text, linked to the feed (the first screenshot below shows this block configuration)",
+          "The ON and OFF values the toggle publishes have to match what the sketch checks for, otherwise the relay never reacts",
+        ],
+      },
+      {
+        heading: "what the important parts of the code do",
+        items: [
+          "WiFi and Adafruit IO credentials at the top: the ESP32 needs Wi-Fi to reach the internet and the AIO username and key to log in to the broker",
+          "Adafruit_MQTT_Client + Adafruit_MQTT_Subscribe: creates the MQTT connection to io.adafruit.com on port 1883 and subscribes to the bulb-switch feed",
+          "connectMQTT(): connects to the broker, and if it fails it prints the error, disconnects, waits 5 seconds and tries again. This is the reconnect fix for my disconnect loop",
+          "setup(): sets GPIO26 as an output and keeps the relay off, connects to Wi-Fi, then subscribes to the feed",
+          "loop(): calls connectMQTT() every pass so a dropped connection recovers, then readSubscription(5000) waits up to 5 seconds for a new message",
+          "When a message arrives on the feed it is compared with \"ON\", and GPIO26 is set HIGH for ON and LOW for anything else, which is what switches the relay and the bulb",
+        ],
+      },
+      {
+        heading: "demo video",
+        body: `The attached video shows the Adafruit IO toggle switching the real bulb on and off.`,
+      },
+    ],
     hardware: ["ESP32 Dev Board", "5V relay module (SRD-05VDC-SL-C)", "230V bulb + holder", "Adafruit IO account"],
     diagram: "Adafruit IO switch --> MQTT --> ESP32 (GPIO26) --> Relay --> 230V Bulb",
     wiring: [
@@ -386,28 +419,40 @@ A couple of things I had to actually sit down and understand for this one instea
         body: `Cloud computing just means using computing power, storage and software that live in someone else's data centre over the internet, instead of running my own server. It's usually split into four levels. IaaS (Infrastructure as a Service) gives you raw machines and storage to set up yourself, like an AWS EC2 virtual machine. PaaS (Platform as a Service) gives you a ready environment to deploy code on without managing the servers, like Google App Engine. SaaS (Software as a Service) is a finished app you simply use, like Gmail. BaaS (Backend as a Service) hands you ready-made backend pieces, a database, logins and hosting, that your app calls directly. Firebase is the BaaS one, and that's the level I worked at for this task.`,
       },
       {
-        heading: "what a cloud platform is",
+        heading: "What a Cloud Platform is",
         body: `A cloud platform is a provider's collection of online services (compute, storage, databases, logins, hosting) that I rent and use through the internet instead of buying hardware. Firebase runs on Google Cloud, so my 'server' here is really just a project in the Firebase console.`,
       },
       {
-        heading: "what a database is",
+        heading: "What a Database is",
         body: `A database is an organised place to store data so it can be saved, read and updated later instead of vanishing when the program stops. Here the ESP32 needs somewhere to leave sensor readings and the dashboard needs somewhere to read them from, so the database is the middle man they both talk to.`,
       },
       {
-        heading: "Firebase Realtime Database",
+        heading: "Firebase Realtime Database explained",
         body: `The Realtime Database is a NoSQL cloud database that stores everything as one big JSON tree. Its useful trick is that clients can subscribe to a path, and Firebase pushes every change to them straight away. My dashboard uses onValue() listeners on the current, settings and logs paths, so numbers update on screen the moment the ESP32 writes them, with no refresh. The ESP32 reads and writes the same tree over the Firebase client library.`,
       },
       {
-        heading: "what a cloud-based dashboard is",
+        heading: "What a Cloud-Based Dashboard is",
         body: `A cloud-based dashboard is a web page hosted online that reads its data from a cloud database, so I can open it from any browser or device and still see the live state of my room. Mine is a single dashboard page (HTML, CSS and JavaScript) deployed on Firebase Hosting. It has live temperature, humidity and light values, a bulb button and a mode switch, and it sits behind a login.`,
       },
       {
-        heading: "authentication and why a login system matters",
+        heading: "Authentication and the purpose of a login system",
         body: `Authentication is proving who you are, here with an email and password checked by Firebase Authentication. Without a login, anyone who found my dashboard link could switch my bulb on and off or read my data, since the page itself is public. So the dashboard checks the signed-in user as soon as it loads (onAuthStateChanged) and sends anyone who isn't signed in back to the login page.`,
       },
       {
-        heading: "authentication vs authorization",
+        heading: "Difference between Authentication and Authorization",
         body: `Authentication answers 'who are you?' and authorization answers 'what are you allowed to do?'. Logging in with the right password is authentication. Authorization is the database rule that says a signed-in user can only read and write their own devices/<uid> branch and nothing else. Being logged in doesn't automatically give access to everything, and that second check is what actually protects the data.`,
+      },
+      {
+        heading: "Firebase project setup",
+        items: [
+          "Opened the Firebase console and created a new project for the smart home system",
+          "Registered a Web app inside the project, which gives the config object (apiKey, authDomain, databaseURL, projectId and so on) the dashboard needs",
+          "Created the Realtime Database, with its server in the Singapore region (asia-southeast1)",
+          "Turned on Authentication and added my user (details in the next section)",
+          "Set the database rules so a signed-in user can only read and write their own devices/<uid> branch, instead of leaving the database open to anyone with the URL",
+          "Pasted the config into the dashboard page, and the API key, database URL and the user's login into the ESP32 sketch",
+          "Deployed the dashboard with Firebase Hosting so it has a public web.app address",
+        ],
       },
       {
         heading: "Firebase Authentication configuration",
@@ -419,7 +464,7 @@ A couple of things I had to actually sit down and understand for this one instea
         ],
       },
       {
-        heading: "how the data flows",
+        heading: "Database and data-flow architecture",
         items: [
           "1. The ESP32 reads the DHT11 (temperature, humidity) and the LDR (light level)",
           "2. It signs in to Firebase with its email and password, then writes the live values to devices/<uid>/current",
@@ -427,6 +472,19 @@ A couple of things I had to actually sit down and understand for this one instea
           "4. When I press the bulb button or change the mode, the dashboard writes to devices/<uid>/settings",
           "5. The ESP32 keeps checking the settings path, and when the command changes it drives the relay on GPIO26 to switch the bulb",
         ],
+      },
+      {
+        heading: "Realtime Database structure",
+        body: "Everything lives under one branch per user, named with that user's UID, split by purpose. The full tree is in the code section below.",
+        items: [
+          "devices/<uid>/current: the live snapshot (temperature, humidity, ldr, bulbState, mode), overwritten by the ESP32 every few seconds",
+          "devices/<uid>/settings: what the dashboard wants (mode, ldrThreshold, bulbCommand), written by the dashboard and read by the ESP32",
+          "devices/<uid>/logs: the history, one record per reading with a unique key, each holding the sensor values plus a server timestamp",
+        ],
+      },
+      {
+        heading: "Complete dashboard source code",
+        body: "The complete dashboard page (HTML, CSS and JavaScript in one file) is in the code section below, and also saved in the repository at code/task4-firebase-dashboard/dashboard.html. It contains the login check, the live temperature, humidity and light cards, the bulb and mode controls, the threshold setting, the history table, the chart and the CSV export. My Firebase keys are replaced with placeholders.",
       },
     ],
     hardware: ["ESP32 Dev Board", "DHT11 (temperature + humidity)", "LDR (light sensor)", "5V relay + 230V bulb", "Firebase project (Realtime Database + Authentication)"],
@@ -840,6 +898,10 @@ After finally getting this all working through multiple rounds of debugging, I c
     concepts: `The three Firebase branches split cleanly by purpose: /current for the live snapshot, /settings for anything the dashboard controls, /logs for the historical trail. Automatic mode just compares the live LDR reading to a threshold, but with a buffer zone around it (hysteresis) so the relay doesn't flicker right at the edge.`,
     sections: [
       {
+        heading: "demo video",
+        body: `The attached video (dashboard readings) shows the complete system running: live DHT11 and LDR values on the dashboard, the bulb, and the history updating.`,
+      },
+      {
         heading: "manual and automatic mode",
         items: [
           "The dashboard has two buttons, Manual and Auto, which write mode = \"MANUAL\" or \"AUTO\" to devices/<uid>/settings. The exact same strings are used in the ESP32 sketch (this is where my AUTO vs AUTOMATIC bug came from)",
@@ -859,8 +921,18 @@ After finally getting this all working through multiple rounds of debugging, I c
         ],
       },
       {
-        heading: "how the logs are stored",
-        body: `Every 3 seconds the ESP32 pushes one new record under devices/<uid>/logs with push(), so Firebase gives each reading its own unique key instead of overwriting the last one. Each record has temperature, humidity, ldr, bulbState and mode, plus a timestamp that Firebase fills in itself on the server (milliseconds since 1970), so I don't need the ESP32 to know the time. The structure is in the code block below.`,
+        heading: "Database structure used for logs",
+        body: "Every 3 seconds the ESP32 adds one new record under devices/<uid>/logs using push(), so each reading gets its own unique key and nothing is overwritten. That makes the logs a growing history, while devices/<uid>/current only holds the latest values. The full tree (current, settings and logs) is also in the code section below.",
+        items: [
+          "Path: devices/<uid>/logs/<push-id>, where <uid> is the logged-in user's UID and <push-id> is a unique key Firebase generates for each reading",
+          "temperature: DHT11 temperature in degrees C (number)",
+          "humidity: DHT11 relative humidity in percent (number)",
+          "ldr: averaged raw LDR reading, 0 to 4095 (number)",
+          "bulbState: \"ON\" or \"OFF\" at the time of the reading (string)",
+          "mode: \"MANUAL\" or \"AUTO\" at the time of the reading (string)",
+          "timestamp: filled in by the Firebase server, in milliseconds since 1970 (number)",
+          "Example record: { temperature: 29.4, humidity: 61, ldr: 2310, bulbState: \"OFF\", mode: \"AUTO\", timestamp: 1763100000000 }",
+        ],
       },
       {
         heading: "history, chart and CSV export",
@@ -1080,11 +1152,11 @@ void updateCurrentValues(float temperature, float humidity, int ldrValue)
     return;
 
   String json = "{";
-  json += "\"temperature\":" + String(temperature, 1);
-  json += ",\"humidity\":" + String(humidity, 1);
-  json += ",\"ldr\":" + String(ldrValue);
-  json += ",\"bulbState\":\"" + String(relayState ? "ON" : "OFF") + "\"";
-  json += ",\"mode\":\"" + mode + "\"";
+  json += "\\"temperature\\":" + String(temperature, 1);
+  json += ",\\"humidity\\":" + String(humidity, 1);
+  json += ",\\"ldr\\":" + String(ldrValue);
+  json += ",\\"bulbState\\":\\"" + String(relayState ? "ON" : "OFF") + "\\"";
+  json += ",\\"mode\\":\\"" + mode + "\\"";
   json += "}";
 
   bool success = Database.set<object_t>(
@@ -1111,24 +1183,24 @@ void logSensorData(
 
   String json = "{";
 
-  json += "\"temperature\":";
+  json += "\\"temperature\\":";
   json += String(temperature, 1);
 
-  json += ",\"humidity\":";
+  json += ",\\"humidity\\":";
   json += String(humidity, 1);
 
-  json += ",\"ldr\":";
+  json += ",\\"ldr\\":";
   json += String(ldrValue);
 
-  json += ",\"bulbState\":\"";
+  json += ",\\"bulbState\\":\\"";
   json += relayState ? "ON" : "OFF";
-  json += "\"";
+  json += "\\"";
 
-  json += ",\"mode\":\"";
+  json += ",\\"mode\\":\\"";
   json += mode;
-  json += "\"";
+  json += "\\"";
 
-  json += ",\"timestamp\":{\".sv\":\"timestamp\"}";
+  json += ",\\"timestamp\\":{\\".sv\\":\\"timestamp\\"}";
 
   json += "}";
 
